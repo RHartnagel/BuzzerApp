@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Page</title>
+    <script>
+        let userName = '';
+
+        // Prompt the user for their name when the page loads
+        function getUserName() {
+            while (!userName) {
+                userName = prompt("Please enter your name:");
+                if (!userName) {
+                    alert("Name is required to continue.");
+                }
+            }
+        }
+
+        function sendBuzzRequest() {
+            if (!userName) {
+                alert("Name is not set. Refresh the page to enter your name.");
+                return;
+            }
+
+            // Disable the button
+            const button = document.getElementById('cooldownButton');
+            button.disabled = true;
+
+            // Send an HTTP request with the user's name
+            fetch(`/buzzIn?name=${encodeURIComponent(userName)}`, {
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Response:', data);
+                alert(data.message); // Display the server response
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred!');
+            });
+
+            // Re-enable the button after 2 seconds
+            setTimeout(() => {
+                button.disabled = false;
+            }, 2000);
+        }
+
+        // Get the user's name when the page loads
+        window.onload = getUserName;
+    </script>
+</head>
+<body>
+    <h1>Welcome!</h1>
+    <p>This is a blank page. Customize as needed.</p>
+    <button id="cooldownButton" onclick="sendBuzzRequest()">BuzzIn</button>
+</body>
+</html>

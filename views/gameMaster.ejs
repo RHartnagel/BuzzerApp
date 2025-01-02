@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blank Page</title>
+    <script>
+        function removeQueueRequest() {
+            // Send an HTTP request to clear the queue
+            fetch('/nextQuestion', {
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Queue cleared:', data.message);
+                alert(data.message); // Notify the user
+                updateQueueDisplay(); // Refresh the queue display
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred!');
+            });
+        }
+
+        function fetchQueue() {
+            // Send an HTTP request to get the current queue
+            fetch('/getQueue', {
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(data => {
+                const queueList = data.list || []; // Get the queue list
+                updateQueueDisplay(queueList); // Update the display
+            })
+            .catch(error => {
+                console.error('Error fetching queue:', error);
+            });
+        }
+
+        function updateQueueDisplay(queue) {
+            const queueContainer = document.getElementById('queueDisplay');
+            queueContainer.innerHTML = ''; // Clear the existing content
+
+            if (queue.length === 0) {
+                queueContainer.innerHTML = '<p>The queue is currently empty.</p>';
+                return;
+            }
+
+            // Create and append list items for each queue member
+            const ul = document.createElement('ul');
+            queue.forEach((name, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${index + 1}. ${name}`;
+                ul.appendChild(li);
+            });
+
+            queueContainer.appendChild(ul);
+        }
+
+        // Update the queue display every .3 seconds
+        setInterval(fetchQueue, 333);
+    </script>
+</head>
+<body>
+    <h1>Welcome!</h1>
+    <button id="clearButton" onclick="removeQueueRequest()">Clear Queue</button>
+    <h2>Current Queue:</h2>
+    <div id="queueDisplay">
+        <p>The queue is currently empty.</p>
+    </div>
+</body>
+</html>
